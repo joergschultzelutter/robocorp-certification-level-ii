@@ -1,2 +1,2 @@
 # robocorp-certification-level-ii
-RoboCorp Certification Level 2
+RoboCorp Certification Level II
