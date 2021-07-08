@@ -61,14 +61,23 @@ Fill the form
     Set Local Variable      ${input_body}       //*[@id="root"]/div/div[1]/div/div[1]/form/div[2]
     Set Local Variable      ${input_legs}       xpath://html/body/div/div/div[1]/div/div[1]/form/div[3]/input
     Set Local Variable      ${input_address}    //*[@id="address"]
-
     Set Local Variable      ${btn_preview}      //*[@id="preview"]
     Set Local Variable      ${btn_order}        //*[@id="order"]
-
     Set Local Variable      ${img_preview}      //*[@id="robot-preview-image"]
 
-    Input Text When Element Is Visible           ${input_legs}          ${legs}
-    Input Text When Element Is Visible           ${input_address}       ${address}
+    # Input the data. I use a "cautious" approach and assume
+    # that there are situations when a field is not yet visible
+    # An even more careful approach would result in checking if e.g.
+    # the given group is actually a radio button, dropdown list etc.
+    # However, this was deemed out of scope for this exercise
+    Wait Until Element Is Visible   ${input_head}
+    Select From List By Value       ${input_head}           ${head}
+
+
+    Wait Until Element Is Visible   ${input_legs}
+    Input Text                      ${input_legs}           ${legs}
+    Wait Until Element Is Visible   ${input_address}
+    Input Text                      ${input_address}        ${address}
 
 
 Log Out And Close The Browser
