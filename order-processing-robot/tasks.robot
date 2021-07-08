@@ -45,15 +45,30 @@ Close the annoying modal
 Fill the form
     [Arguments]     ${myrow}
 
+    # Extract the values from the  dictionary
     Set Local Variable    ${order_no}   ${myrow}[Order number]
     Set Local Variable    ${head}       ${myrow}[Head]
     Set Local Variable    ${body}       ${myrow}[Body]
     Set Local Variable    ${legs}       ${myrow}[Legs]
     Set Local Variable    ${address}    ${myrow}[Address]
 
+    # Define local variables for the UI elements
+    # "legs" UID changes all the time so this one uses an
+    # absolute xpath. I prefer local variables over 
+    # "Assign ID To Element" as the latter does not seem
+    # to be able to use a full XPath reference
+    Set Local Variable      ${input_head}       //*[@id="head"]
+    Set Local Variable      ${input_body}       //*[@id="root"]/div/div[1]/div/div[1]/form/div[2]
+    Set Local Variable      ${input_legs}       xpath://html/body/div/div/div[1]/div/div[1]/form/div[3]/input
+    Set Local Variable      ${input_address}    //*[@id="address"]
 
-    Input Text When Element Is Visible           xpath://html/body/div/div/div[1]/div/div[1]/form/div[3]/input      ${legs}
-    Input Text When Element Is Visible           address            ${address}
+    Set Local Variable      ${btn_preview}      //*[@id="preview"]
+    Set Local Variable      ${btn_order}        //*[@id="order"]
+
+    Set Local Variable      ${img_preview}      //*[@id="robot-preview-image"]
+
+    Input Text When Element Is Visible           ${input_legs}          ${legs}
+    Input Text When Element Is Visible           ${input_address}       ${address}
 
 
 Log Out And Close The Browser
