@@ -19,7 +19,7 @@ Order robots from RobotSpareBin Industries Inc
 
     #     Close the annoying modal
     Fill the form           ${row}
-    #     Preview the robot
+    Preview the robot
     #     Submit the order
     #     ${pdf}=    Store the receipt as a PDF file    ${row}[Order number]
     #     ${screenshot}=    Take a screenshot of the robot    ${row}[Order number]
@@ -74,12 +74,27 @@ Fill the form
     Select From List By Value       ${input_head}           ${head}
 
     Wait Until Element Is Visible   ${input_body}
-    Select Radio Button                ${input_body}           ${body}
+    Select Radio Button             ${input_body}           ${body}
 
     Wait Until Element Is Visible   ${input_legs}
     Input Text                      ${input_legs}           ${legs}
     Wait Until Element Is Visible   ${input_address}
     Input Text                      ${input_address}        ${address}
+
+Preview the robot
+    # Define local variables for the UI elements
+    Set Local Variable              ${btn_preview}      //*[@id="preview"]
+    Click Button                    ${btn_preview}
+
+Submit the order
+    # Define local variables for the UI elements
+    # "legs" UID changes all the time so this one uses an
+    # absolute xpath. I prefer local variables over 
+    # "Assign ID To Element" as the latter does not seem
+    # to be able to use a full XPath reference
+    Set Local Variable      ${btn_order}        //*[@id="order"]
+    Set Local Variable      ${img_preview}      //*[@id="robot-preview-image"]
+
 
 
 Log Out And Close The Browser
