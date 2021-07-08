@@ -8,6 +8,8 @@ Documentation      Orders robots from RobotSpareBin Industries Inc.
 Library           RPA.Browser.Selenium
 Library           RPA.HTTP
 Library           RPA.Tables
+Library           RPA.PDF
+
 
 Suite Setup       Open the robot order website
 Suite Teardown    Log Out And Close The Browser
@@ -16,11 +18,11 @@ Suite Teardown    Log Out And Close The Browser
 Order robots from RobotSpareBin Industries Inc
     ${orders}=    Get orders
     FOR    ${row}    IN    @{orders}
-
-    #     Close the annoying modal
-    Fill the form           ${row}
-    Preview the robot
-    #     Submit the order
+        Close the annoying modal
+        Fill the form           ${row}
+        Preview the robot
+#        Submit the order
+#        Take a screenshot of the robot
     #     ${pdf}=    Store the receipt as a PDF file    ${row}[Order number]
     #     ${screenshot}=    Take a screenshot of the robot    ${row}[Order number]
     #     Embed the robot screenshot to the receipt PDF file    ${screenshot}    ${pdf}
@@ -39,7 +41,8 @@ Get orders
     [Return]    ${table}
 
 Close the annoying modal
-    Click Button When Visible   Yep
+     Log To Console     Fuck Javascript
+#    Click Button When Visible   Yep
 
 
 Fill the form
@@ -88,14 +91,20 @@ Preview the robot
 
 Submit the order
     # Define local variables for the UI elements
-    # "legs" UID changes all the time so this one uses an
-    # absolute xpath. I prefer local variables over 
-    # "Assign ID To Element" as the latter does not seem
-    # to be able to use a full XPath reference
-    Set Local Variable      ${btn_order}        //*[@id="order"]
-    Set Local Variable      ${img_preview}      //*[@id="robot-preview-image"]
+    Set Local Variable              ${btn_order}        //*[@id="order"]
+    Click button                    ${btn_order}
 
+Take a screenshot of the robot
+    # Define local variables for the UI elements
+    Set Local Variable      ${lbl_orderid}      xpath://html/body/div/div/div[1]/div/div[1]/div/div/p[1]
+    Set Local Variable      ${img_robot}        //*[@id="robot-preview-image"]
 
+    # Set output dir
+    Set Local Variable      ${image_folder}     bilder
+
+    #Get the order ID
+    ${orderid}=             Get Text            //*[@id="receipt"]/p[1]
+    #Capture Element Screenshot      ${img_robot}    ${image_folder}${/}${orderid}
 
 Log Out And Close The Browser
 #    Click Button    Log out
