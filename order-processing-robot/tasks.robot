@@ -20,20 +20,24 @@ Order robots from RobotSpareBin Industries Inc
     FOR    ${row}    IN    @{orders}
         Close the annoying modal
         Fill the form           ${row}
+        Log To Console      Preview
         Preview the robot
-#        Submit the order
-#        Take a screenshot of the robot
+
+        Log To Console      Submit
+        Submit the order
+        Take a screenshot of the robot
     #     ${pdf}=    Store the receipt as a PDF file    ${row}[Order number]
     #     ${screenshot}=    Take a screenshot of the robot    ${row}[Order number]
     #     Embed the robot screenshot to the receipt PDF file    ${screenshot}    ${pdf}
-    #     Go to order another robot
+
+        Log To Console      Order Another Robot
+         Go to order another robot
     END
     # Create a ZIP file of the receipts
 
 *** Keywords ***
 Open the robot order website
     Open Available Browser     https://robotsparebinindustries.com/#/robot-order
-    Click Button               Yep
 
 Get orders
     Download    https://robotsparebinindustries.com/orders.csv      overwrite=True
@@ -41,8 +45,9 @@ Get orders
     [Return]    ${table}
 
 Close the annoying modal
-     Log To Console     Fuck Javascript
-#    Click Button When Visible   Yep
+    # Define local variables for the UI elements
+    Set Local Variable              ${btn_yep}        //*[@id="root"]/div/div[2]/div/div/div/div/div/button[2]
+    Wait And Click Button           ${btn_yep}
 
 
 Fill the form
@@ -74,14 +79,15 @@ Fill the form
     # the given group is actually a radio button, dropdown list etc.
     # However, this was deemed out of scope for this exercise
     Wait Until Element Is Visible   ${input_head}
+    Wait Until Element Is Enabled   ${input_head}
     Select From List By Value       ${input_head}           ${head}
 
-    Wait Until Element Is Visible   ${input_body}
+    Wait Until Element Is Enabled   ${input_body}
     Select Radio Button             ${input_body}           ${body}
 
-    Wait Until Element Is Visible   ${input_legs}
+    Wait Until Element Is Enabled   ${input_legs}
     Input Text                      ${input_legs}           ${legs}
-    Wait Until Element Is Visible   ${input_address}
+    Wait Until Element Is Enabled   ${input_address}
     Input Text                      ${input_address}        ${address}
 
 Preview the robot
@@ -104,7 +110,14 @@ Take a screenshot of the robot
 
     #Get the order ID
     ${orderid}=             Get Text            //*[@id="receipt"]/p[1]
-    #Capture Element Screenshot      ${img_robot}    ${image_folder}${/}${orderid}
+
+    #Create the screenshot
+    Capture Element Screenshot      ${img_robot}    ${image_folder}${/}${orderid}.png
+
+Go to order another robot
+    # Define local variables for the UI elements
+    Set Local Variable      ${btn_order_another_robot}      //*[@id="order-another"]
+    Click Button            ${btn_order_another_robot}
 
 Log Out And Close The Browser
 #    Click Button    Log out
