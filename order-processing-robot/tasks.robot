@@ -58,7 +58,7 @@ Fill the form
     # "Assign ID To Element" as the latter does not seem
     # to be able to use a full XPath reference
     Set Local Variable      ${input_head}       //*[@id="head"]
-    Set Local Variable      ${input_body}       //*[@id="root"]/div/div[1]/div/div[1]/form/div[2]
+    Set Local Variable      ${input_body}       body
     Set Local Variable      ${input_legs}       xpath://html/body/div/div/div[1]/div/div[1]/form/div[3]/input
     Set Local Variable      ${input_address}    //*[@id="address"]
     Set Local Variable      ${btn_preview}      //*[@id="preview"]
@@ -73,6 +73,8 @@ Fill the form
     Wait Until Element Is Visible   ${input_head}
     Select From List By Value       ${input_head}           ${head}
 
+    Wait Until Element Is Visible   ${input_body}
+    Select Radio Button                ${input_body}           ${body}
 
     Wait Until Element Is Visible   ${input_legs}
     Input Text                      ${input_legs}           ${legs}
