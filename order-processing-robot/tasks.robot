@@ -24,7 +24,7 @@ Order robots from RobotSpareBin Industries Inc
         Preview the robot
 
         Log To Console      Submit
-        Submit the order
+        Wait Until Keyword Succeeds     10x     5s      Submit The Order
         Take a screenshot of the robot
     #     ${pdf}=    Store the receipt as a PDF file    ${row}[Order number]
     #     ${screenshot}=    Take a screenshot of the robot    ${row}[Order number]
@@ -120,5 +120,5 @@ Go to order another robot
     Click Button            ${btn_order_another_robot}
 
 Log Out And Close The Browser
-#    Click Button    Log out
+    Click Button    Log out
     Close Browser
