@@ -9,10 +9,15 @@ Library           RPA.Browser.Selenium
 Library           RPA.HTTP
 Library           RPA.Tables
 Library           RPA.PDF
+Library           Collections
 
 
 Suite Setup       Open the robot order website
 Suite Teardown    Log Out And Close The Browser
+
+*** Variables ***
+${url}            https://robotsparebinindustries.com/#/robot-order
+
 
 *** Test Cases ***
 Order robots from RobotSpareBin Industries Inc
@@ -23,7 +28,7 @@ Order robots from RobotSpareBin Industries Inc
         Wait Until Keyword Succeeds     10x     5s    Preview the robot
         Wait Until Keyword Succeeds     10x     5s      Submit The Order
         ${orderid}=    Take a screenshot of the robot
-    #     ${pdf}=    Store the receipt as a PDF file    ${row}[Order number]
+        Store the receipt as a PDF file    ORDER_NUMBER=${order_id}
     #     Embed the robot screenshot to the receipt PDF file    ${screenshot}    ${pdf}
 
         Log To Console      Order Another Robot
@@ -126,3 +131,9 @@ Log Out And Close The Browser
 
 Create a Zip File of the Receipts
     Log To Console    Test
+
+Store the receipt as a PDF file
+    [Arguments]        ${ORDER_NUMBER}
+
+    Log To Console     Printing ${ORDER_NUMBER}
+         
