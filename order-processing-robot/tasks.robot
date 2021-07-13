@@ -22,15 +22,14 @@ Order robots from RobotSpareBin Industries Inc
         Fill the form           ${row}
         Wait Until Keyword Succeeds     10x     5s    Preview the robot
         Wait Until Keyword Succeeds     10x     5s      Submit The Order
-        Take a screenshot of the robot
+        ${orderid}=    Take a screenshot of the robot
     #     ${pdf}=    Store the receipt as a PDF file    ${row}[Order number]
-    #     ${screenshot}=    Take a screenshot of the robot    ${row}[Order number]
     #     Embed the robot screenshot to the receipt PDF file    ${screenshot}    ${pdf}
 
         Log To Console      Order Another Robot
          Go to order another robot
     END
-    # Create a ZIP file of the receipts
+    Create a ZIP file of the receipts
 
 *** Keywords ***
 Open the robot order website
@@ -114,6 +113,8 @@ Take a screenshot of the robot
 
     #Create the screenshot
     Capture Element Screenshot      ${img_robot}    ${image_folder}${/}${orderid}.png
+    
+    [Return]    ${orderid}
 
 Go to order another robot
     # Define local variables for the UI elements
@@ -122,3 +123,6 @@ Go to order another robot
 
 Log Out And Close The Browser
     Close Browser
+
+Create a Zip File of the Receipts
+    Log To Console    Test
