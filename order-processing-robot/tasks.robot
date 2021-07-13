@@ -20,10 +20,7 @@ Order robots from RobotSpareBin Industries Inc
     FOR    ${row}    IN    @{orders}
         Close the annoying modal
         Fill the form           ${row}
-        Log To Console      Preview
-        Preview the robot
-
-        Log To Console      Submit
+        Wait Until Keyword Succeeds     10x     5s    Preview the robot
         Wait Until Keyword Succeeds     10x     5s      Submit The Order
         Take a screenshot of the robot
     #     ${pdf}=    Store the receipt as a PDF file    ${row}[Order number]
@@ -40,7 +37,7 @@ Open the robot order website
     Open Available Browser     https://robotsparebinindustries.com/#/robot-order
 
 Get orders
-    Download    https://robotsparebinindustries.com/orders.csv      overwrite=True
+#    Download    https://robotsparebinindustries.com/orders.csv      overwrite=True
     ${table}=   Read table from CSV    orders.csv
     [Return]    ${table}
 
@@ -48,7 +45,6 @@ Close the annoying modal
     # Define local variables for the UI elements
     Set Local Variable              ${btn_yep}        //*[@id="root"]/div/div[2]/div/div/div/div/div/button[2]
     Wait And Click Button           ${btn_yep}
-
 
 Fill the form
     [Arguments]     ${myrow}
@@ -75,6 +71,8 @@ Fill the form
 
     # Input the data. I use a "cautious" approach and assume
     # that there are situations when a field is not yet visible
+    # It is however assumed that all of the input elements are visible
+    # when the first element has been rendered visible.
     # An even more careful approach would result in checking if e.g.
     # the given group is actually a radio button, dropdown list etc.
     # However, this was deemed out of scope for this exercise
@@ -98,7 +96,10 @@ Preview the robot
 Submit the order
     # Define local variables for the UI elements
     Set Local Variable              ${btn_order}        //*[@id="order"]
+    Set Local Variable              ${lbl_receipt}      //*[@id="receipt"]
+
     Click button                    ${btn_order}
+    Page Should Contain Element     ${lbl_receipt}
 
 Take a screenshot of the robot
     # Define local variables for the UI elements
@@ -120,5 +121,4 @@ Go to order another robot
     Click Button            ${btn_order_another_robot}
 
 Log Out And Close The Browser
-    Click Button    Log out
     Close Browser
