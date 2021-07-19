@@ -136,4 +136,4 @@ Store the receipt as a PDF file
     [Arguments]        ${ORDER_NUMBER}
 
     Log To Console     Printing ${ORDER_NUMBER}
-         
+    Print To PDF
