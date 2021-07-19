@@ -160,6 +160,15 @@ Embed the robot screenshot to the receipt PDF file
     @{myfiles}=       Create List     ${IMG_FILE}:x=0,y=0
 
     # Add the files to the PDF
+    #
+    # Note:
+    #
+    # 'append' requires the latest RPAframework. Update the version in the conda.yaml file - otherwise,
+    # this will not work. The auto-generated file contains a version number that is way too old.
+    #
+    # per https://github.com/robocorp/rpaframework/blob/master/packages/pdf/src/RPA/PDF/keywords/document.py,
+    # an "append" always adds a NEW page to the file. I don't see a way to add the image to the first page
+    # which contains the order data
     Add Files To PDF    ${myfiles}    ${PDF_FILE}     ${True}
 
     Close PDF           ${PDF_FILE}
