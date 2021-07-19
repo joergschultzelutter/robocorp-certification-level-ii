@@ -130,3 +130,9 @@ dmypy.json
 log.html
 output.xml
 report.html
+*.zip
+.DS_Store
+bilder/
+orders.csv
+pdf/
+

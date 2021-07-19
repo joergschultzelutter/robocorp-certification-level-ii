@@ -9,15 +9,17 @@ Library           RPA.Browser.Selenium
 Library           RPA.HTTP
 Library           RPA.Tables
 Library           RPA.PDF
+Library           RPA.Archive
 Library           Collections
-
 
 Suite Setup       Open the robot order website
 Suite Teardown    Log Out And Close The Browser
 
 *** Variables ***
 ${url}            https://robotsparebinindustries.com/#/robot-order
-
+${img_folder}     ${CURDIR}${/}bilder
+${pdf_folder}     ${CURDIR}${/}pdf
+${orders_file}    ${CURDIR}${/}orders.csv
 
 *** Test Cases ***
 Order robots from RobotSpareBin Industries Inc
@@ -25,14 +27,12 @@ Order robots from RobotSpareBin Industries Inc
     FOR    ${row}    IN    @{orders}
         Close the annoying modal
         Fill the form           ${row}
-        Wait Until Keyword Succeeds     10x     5s    Preview the robot
-        Wait Until Keyword Succeeds     10x     5s      Submit The Order
-        ${orderid}=    Take a screenshot of the robot
-        Store the receipt as a PDF file    ORDER_NUMBER=${order_id}
-    #     Embed the robot screenshot to the receipt PDF file    ${screenshot}    ${pdf}
-
-        Log To Console      Order Another Robot
-         Go to order another robot
+        Wait Until Keyword Succeeds     10x     2s    Preview the robot
+        Wait Until Keyword Succeeds     10x     2s    Submit The Order
+        ${orderid}  ${img_filename}=    Take a screenshot of the robot
+        ${pdf_filename}=                Store the receipt as a PDF file    ORDER_NUMBER=${order_id}
+        Embed the robot screenshot to the receipt PDF file     IMG_FILE=${img_filename}    PDF_FILE=${pdf_filename}
+        Go to order another robot
     END
     Create a ZIP file of the receipts
 
@@ -41,8 +41,8 @@ Open the robot order website
     Open Available Browser     https://robotsparebinindustries.com/#/robot-order
 
 Get orders
-#    Download    https://robotsparebinindustries.com/orders.csv      overwrite=True
-    ${table}=   Read table from CSV    orders.csv
+    Download    url=https://robotsparebinindustries.com/orders.csv      target_file=${orders_file}    overwrite=True
+    ${table}=   Read table from CSV    path=${orders_file}
     [Return]    ${table}
 
 Close the annoying modal
@@ -110,16 +110,22 @@ Take a screenshot of the robot
     Set Local Variable      ${lbl_orderid}      xpath://html/body/div/div/div[1]/div/div[1]/div/div/p[1]
     Set Local Variable      ${img_robot}        //*[@id="robot-preview-image"]
 
-    # Set output dir
-    Set Local Variable      ${image_folder}     bilder
-
     #Get the order ID
-    ${orderid}=             Get Text            //*[@id="receipt"]/p[1]
+    Wait Until Element Is Visible   ${img_robot}
+    Wait Until Element Is Visible   ${lbl_orderid} 
 
-    #Create the screenshot
-    Capture Element Screenshot      ${img_robot}    ${image_folder}${/}${orderid}.png
+    #get the order ID   
+    ${orderid}=                     Get Text            //*[@id="receipt"]/p[1]
+
+    # Create the File Name
+    Set Local Variable              ${fully_qualified_img_filename}    ${img_folder}${/}${orderid}.png
+
+    #Wait 1 sec, then create the screenshot
+    Sleep   1sec
+    Log To Console      Capture Screenshot to ${fully_qualified_img_filename}
+    Capture Element Screenshot      ${img_robot}    ${fully_qualified_img_filename}
     
-    [Return]    ${orderid}
+    [Return]    ${orderid}  ${fully_qualified_img_filename}
 
 Go to order another robot
     # Define local variables for the UI elements
@@ -135,5 +141,25 @@ Create a Zip File of the Receipts
 Store the receipt as a PDF file
     [Arguments]        ${ORDER_NUMBER}
 
-    Log To Console     Printing ${ORDER_NUMBER}
-    Print To PDF
+    Wait Until Element Is Visible   //*[@id="receipt"]
+    Log To Console                  Printing ${ORDER_NUMBER}
+    ${order_receipt_html}=          Get Element Attribute   //*[@id="receipt"]  outerHTML
+
+    Set Local Variable              ${fully_qualified_pdf_filename}    ${pdf_folder}${/}${ORDER_NUMBER}.pdf
+
+    Html To Pdf                     content=${order_receipt_html}   output_path=${fully_qualified_pdf_filename}
+
+    [Return]    ${fully_qualified_pdf_filename}
+
+Embed the robot screenshot to the receipt PDF file
+    [Arguments]     ${IMG_FILE}     ${PDF_FILE}
+
+    Open PDF        ${PDF_FILE}
+
+    # Create the list of files that is to be added to the PDF (here, it is just one file)
+    @{myfiles}=       Create List     ${IMG_FILE}:x=0,y=0
+
+    # Add the files to the PDF
+    Add Files To PDF    ${myfiles}    ${PDF_FILE}     ${True}
+
+    Close PDF           ${PDF_FILE}
