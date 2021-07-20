@@ -11,9 +11,11 @@ Library           RPA.Tables
 Library           RPA.PDF
 Library           RPA.Archive
 Library           Collections
+Library           RPA.Dialogs
+Library           RPA.Robocloud.Secrets
 
-Suite Setup       Open the robot order website
-Suite Teardown    Log Out And Close The Browser
+#Suite Setup       Open the robot order website
+#Suite Teardown    Log Out And Close The Browser
 
 *** Variables ***
 ${url}            https://robotsparebinindustries.com/#/robot-order
@@ -21,10 +23,15 @@ ${img_folder}     ${CURDIR}${/}bilder
 ${pdf_folder}     ${CURDIR}${/}pdf
 ${orders_file}    ${CURDIR}${/}orders.csv
 ${zip_file}       ${CURDIR}${/}bilder.zip
+${csv_url}        https://robotsparebinindustries.com/orders.csv
 
 
 *** Test Cases ***
 Order robots from RobotSpareBin Industries Inc
+
+    ${username}=    Get The User Name
+    Open the robot order website
+
     ${orders}=    Get orders
     FOR    ${row}    IN    @{orders}
         Close the annoying modal
@@ -38,12 +45,28 @@ Order robots from RobotSpareBin Industries Inc
     END
     Create a ZIP file of the receipts
 
+    Log Out And Close The Browser
+    Display the success dialog  USER_NAME=${username}
+
 *** Keywords ***
+Get The User Name
+    Add heading             I am your RoboCorp Order Genie
+    Add text input          myname    label=What is thy name, sire?     placeholder=Give me some input here
+    ${result}=              Run dialog
+    [Return]                ${result.myname}
+
+Display the success dialog
+    [Arguments]   ${USER_NAME}
+    Add icon      Success
+    Add heading   Your orders have been processed
+    Add text      Dear ${USER_NAME} - all orders have been processed. Have a nice day!
+    Run dialog    title=Success
+
 Open the robot order website
-    Open Available Browser     https://robotsparebinindustries.com/#/robot-order
+    Open Available Browser     ${url}
 
 Get orders
-    Download    url=https://robotsparebinindustries.com/orders.csv      target_file=${orders_file}    overwrite=True
+    Download    url=${csv_url}      target_file=${orders_file}    overwrite=True
     ${table}=   Read table from CSV    path=${orders_file}
     [Return]    ${table}
 
@@ -122,9 +145,11 @@ Take a screenshot of the robot
     # Create the File Name
     Set Local Variable              ${fully_qualified_img_filename}    ${img_folder}${/}${orderid}.png
 
-    #Wait 1 sec, then create the screenshot
+    # The sleep command is a dirty workaround for the case where one part of the three-folded image has not yet been loaded
+    # This can happen at very throttled download speeds and results in an incomplete target image.
+    # A preference would be to have a keyword such as "Wait until image has been downloaded" over this quick hack
     Sleep   1sec
-    Log To Console      Capture Screenshot to ${fully_qualified_img_filename}
+    Log To Console                  Capturing Screenshot to ${fully_qualified_img_filename}
     Capture Element Screenshot      ${img_robot}    ${fully_qualified_img_filename}
     
     [Return]    ${orderid}  ${fully_qualified_img_filename}
@@ -166,7 +191,7 @@ Embed the robot screenshot to the receipt PDF file
     # Note:
     #
     # 'append' requires the latest RPAframework. Update the version in the conda.yaml file - otherwise,
-    # this will not work. The auto-generated file contains a version number that is way too old.
+    # this will not work. The VSCode auto-generated file contains a version number that is way too old.
     #
     # per https://github.com/robocorp/rpaframework/blob/master/packages/pdf/src/RPA/PDF/keywords/document.py,
     # an "append" always adds a NEW page to the file. I don't see a way to EMBED the image in the first page
