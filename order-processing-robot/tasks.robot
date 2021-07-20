@@ -20,6 +20,8 @@ ${url}            https://robotsparebinindustries.com/#/robot-order
 ${img_folder}     ${CURDIR}${/}bilder
 ${pdf_folder}     ${CURDIR}${/}pdf
 ${orders_file}    ${CURDIR}${/}orders.csv
+${zip_file}       ${CURDIR}${/}bilder.zip
+
 
 *** Test Cases ***
 Order robots from RobotSpareBin Industries Inc
@@ -136,7 +138,7 @@ Log Out And Close The Browser
     Close Browser
 
 Create a Zip File of the Receipts
-    Log To Console    Test
+    Archive Folder With ZIP     ${img_folder}  ${zip_file}   recursive=True  include=*.png
 
 Store the receipt as a PDF file
     [Arguments]        ${ORDER_NUMBER}
@@ -167,7 +169,7 @@ Embed the robot screenshot to the receipt PDF file
     # this will not work. The auto-generated file contains a version number that is way too old.
     #
     # per https://github.com/robocorp/rpaframework/blob/master/packages/pdf/src/RPA/PDF/keywords/document.py,
-    # an "append" always adds a NEW page to the file. I don't see a way to add the image to the first page
+    # an "append" always adds a NEW page to the file. I don't see a way to EMBED the image in the first page
     # which contains the order data
     Add Files To PDF    ${myfiles}    ${PDF_FILE}     ${True}
 
