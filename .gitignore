@@ -132,7 +132,10 @@ output.xml
 report.html
 *.zip
 .DS_Store
-bilder/
+image_files/
 orders.csv
-pdf/
+pdf_files/
+output/
+.virtual_documents/
+testrun/
 
