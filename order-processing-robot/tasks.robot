@@ -72,13 +72,15 @@ Directory Cleanup
     # The archive command will not create this automatically so we need to ensure that the directory is there
     # Create Directory will not give us an error if the directory already exists.
     Create Directory    ${output_folder}
+    Create Directory    ${img_folder}
+    Create Directory    ${pdf_folder}
 
     Empty Directory     ${img_folder}
     Empty Directory     ${pdf_folder}
     Empty Directory     ${output_folder}
 
 Get orders
-    Download    url=${csv_url}      target_file=${orders_file}    overwrite=True
+    Download    url=${csv_url}         target_file=${orders_file}    overwrite=True
     ${table}=   Read table from CSV    path=${orders_file}
     [Return]    ${table}
 
@@ -186,9 +188,6 @@ Log Out And Close The Browser
     Close Browser
 
 Create a Zip File of the Receipts
-
-
-
     Archive Folder With ZIP     ${pdf_folder}  ${zip_file}   recursive=True  include=*.pdf
 
 Store the receipt as a PDF file
